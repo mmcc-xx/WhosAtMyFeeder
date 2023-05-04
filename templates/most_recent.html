@@ -14,16 +14,18 @@
         <th>Detection Index</th>
         <th>Score</th>
         <th>Display Name</th>
+        <th>Common Names</th>
         <th>Category Name</th>
         <th>Image</th>
       </tr>
-      {% for record in records %}
+      {% for record, commonnames in zipped_data %}
       <tr>
         <td>{{ record[0] }}</td>
         <td>{{ record[1] }}</td>
         <td>{{ record[2] }}</td>
         <td>{{ record[3] }}</td>
         <td>{{ record[4] }}</td>
+        <td>{{'<br>'.join(commonnames)|safe}}</td>
         <td>{{ record[5] }}</td>
         <td>
           <img src="data:image/jpeg;base64,{{ record[6] }}" alt="Image" width="200" />

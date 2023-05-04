@@ -10,12 +10,16 @@
     <table>
       <tr>
         <th>Fancy Name</th>
+        <th>Common Names</th>
         <th>Frequency</th>
         <th>Image</th>
       </tr>
-      {% for row, image in zipped_data %}
+      {% for row, image, commonnames in zipped_data %}
       <tr>
         <td>{{ row[1] }}</td>
+        <td>
+        {{'<br>'.join(commonnames)|safe}}
+        </td>
         <td>{{ row[2] }}</td>
         <td>
           <img src="data:image/jpeg;base64,{{ image }}" alt="Image" width="200" />
