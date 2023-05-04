@@ -1,5 +1,7 @@
-#Who's At My Feeder?
+# Who's At My Feeder?
+
 ![screenshot](screenshot.jpg)
+
 This app works with [Frigate](https://frigate.video/) to identify the species of
 the birds that Frigate detects.
 
@@ -26,7 +28,7 @@ messages from Frigate, runs the attached images through the
 classifier, and stores results to a sqlite database.
 - webui.py has a terrible web ui to show the results
 
-##To Do...
+## To Do...
 - Containerize the application to make running it easier
 - Make the web UI less terrible
 - Run the web UI with a more robust web server
