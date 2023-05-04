@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Select Date and Sort Order</title>
+  </head>
+  <body>
+    <h1>Select Date and Sort Order</h1>
+    <form action="/" method="post">
+      <label for="date">Date:</label>
+      <input type="date" id="date" name="date" value="{{ today }}" required>
+      <br><br>
+      <label for="sort_order">Sort by:</label>
+      <select id="sort_order" name="sort_order" required>
+        <option value="DESC">Most Frequent</option>
+        <option value="ASC">Least Frequent</option>
+      </select>
+      <br><br>
+      <input type="submit" value="Submit">
+    </form>
+  </body>
+    <br>
+    <a href="{{ url_for('recent_records') }}">View Most Recent 50 Birds</a>
+</html>

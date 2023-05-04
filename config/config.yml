@@ -1,0 +1,11 @@
+frigate:
+  mqtt_server: 192.168.1.75
+  main_topic: frigate
+  camera: birdcam
+  object: bird
+classification:
+  model: model.tflite
+  threshold: 0.7
+webui:
+  port: 7766
+  host: 0.0.0.0

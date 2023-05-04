@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Results</title>
+  </head>
+  <body>
+    <h1>Results for {{ date }}</h1>
+    <table>
+      <tr>
+        <th>Fancy Name</th>
+        <th>Frequency</th>
+        <th>Image</th>
+      </tr>
+      {% for row, image in zipped_data %}
+      <tr>
+        <td>{{ row[1] }}</td>
+        <td>{{ row[2] }}</td>
+        <td>
+          <img src="data:image/jpeg;base64,{{ image }}" alt="Image" width="200" />
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+    <br>
+    <a href="{{ url_for('index') }}">Go back to selection</a>
+  </body>
+</html>
