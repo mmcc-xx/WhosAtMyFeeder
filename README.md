@@ -16,6 +16,7 @@ available for 3.10. You'll need a variety of libraries including...
 - Flask
 - PyYAML
 - opencv-python
+- EcoNameTranslator
 
 ... and probably some others that I'm forgetting.
 
