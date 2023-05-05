@@ -12,7 +12,7 @@
       <h1 class="mb-4">Results for {{ date }}</h1>
       <div class="d-flex justify-content-between mb-3">
         <a href="{{ url_for('index') }}" class="btn btn-primary">Go back to selection</a>
-        <a href="{{ url_for('results', date=date, sort_order='DESC' if sort_order == 'ASC' else 'ASC') }}" class="btn btn-secondary">Switch sort order</a>
+        <a href="{{ url_for('results', date=date, sort_order='desc' if sort_order == 'asc' else 'asc') }}" class="btn btn-secondary">Switch sort order</a>
       </div>
       <table class="table">
         <thead>
@@ -26,7 +26,7 @@
         <tbody>
           {% for row, image, commonnames in zipped_data %}
           <tr>
-            <td>{{ row[1] }}</td>
+            <td><a href="{{ url_for('display_images', date=date, fancy_name=row[1]) }}">{{ row[1] }}</a></td>
             <td>{{'<br>'.join(commonnames)|safe}}</td>
             <td>{{ row[2] }}</td>
             <td>

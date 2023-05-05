@@ -132,6 +132,28 @@ def results():
     return render_template('results.html', zipped_data=zipped_data, date=date, sort_order=sort_order)
 
 
+@app.route('/display_images/<date>/<fancy_name>')
+def display_images(date, fancy_name):
+    conn = sqlite3.connect('speciesid.db')
+    cur = conn.cursor()
+
+    # Convert date string to datetime object
+    date_obj = datetime.strptime(date, '%Y-%m-%d')
+
+    # Get images, timestamps, and scores for the specified date and fancy_name
+    cur.execute(
+        "SELECT image, detection_time, score FROM detections WHERE date(detection_time) = ? AND display_name = ?",
+        (date_obj.date(), fancy_name))
+    images = [(row[0], row[1], row[2]) for row in cur.fetchall()]
+
+    conn.close()
+    for i, image in enumerate(images):
+        images[i] = list(image)
+        images[i][0] = base64.b64encode(image[0]).decode("utf-8")
+
+    return render_template('image_grid.html', date=date, fancy_name=fancy_name, images=images)
+
+
 def load_config():
     global config
     file_path = './config/config.yml'
