@@ -27,9 +27,9 @@ There are two scripts to run...
 - speciesid.py listens to snapshot
 messages from Frigate, runs the attached images through the
 classifier, and stores results to a sqlite database.
-- webui.py has a terrible web ui to show the results
+- webui.py has a web ui to show the results
 
 ## To Do...
 - Containerize the application to make running it easier
-- Make the web UI less terrible
+- Add some more functions to the Web UI
 - Run the web UI with a more robust web server
