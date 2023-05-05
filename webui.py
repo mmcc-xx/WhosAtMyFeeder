@@ -9,6 +9,14 @@ app = Flask(__name__)
 config = None
 
 
+def format_datetime(value, format='%B %d, %Y %H:%M:%S'):
+    dt = datetime.strptime(value, '%Y-%m-%d %H:%M:%S.%f')  # Adjusted input format to include microseconds
+    return dt.strftime(format)
+
+
+app.jinja_env.filters['datetime'] = format_datetime
+
+
 def get_common_names(scientific_name):
     conn = sqlite3.connect('speciesid.db')
     cursor = conn.cursor()
@@ -121,7 +129,7 @@ def results():
     sort_order = request.args.get('sort_order', 'DESC')
     data, images, commonnames = frequencies_by_date(date, sort_order)
     zipped_data = zip(data, images, commonnames)
-    return render_template('results.html', zipped_data=zipped_data, date=date)
+    return render_template('results.html', zipped_data=zipped_data, date=date, sort_order=sort_order)
 
 
 def load_config():

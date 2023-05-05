@@ -3,23 +3,47 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Select Date and Sort Order</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" href="{{ url_for('static', filename='flutter_dash_black_24dp.svg') }}" type="image/svg+xml">
+    <title>Who's At My Feeder?</title>
   </head>
-  <body>
-    <h1>Select Date and Sort Order</h1>
-    <form action="/" method="post">
-      <label for="date">Date:</label>
-      <input type="date" id="date" name="date" value="{{ today }}" required>
-      <br><br>
-      <label for="sort_order">Sort by:</label>
-      <select id="sort_order" name="sort_order" required>
-        <option value="DESC">Most Frequent</option>
-        <option value="ASC">Least Frequent</option>
-      </select>
-      <br><br>
-      <input type="submit" value="Submit">
-    </form>
+  <body class="bg-light">
+    <div class="container py-5">
+      <h1 class="mb-4">Who's At My Feeder?</h1>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h2 class="card-title">Daily Summary</h2>
+              <form action="/" method="post">
+                <div class="mb-3">
+                  <label for="date" class="form-label">Date:</label>
+                  <input type="date" id="date" name="date" class="form-control" value="{{ today }}" required>
+                </div>
+                <div class="mb-3">
+                  <label for="sort_order" class="form-label">Sort by:</label>
+                  <select id="sort_order" name="sort_order" class="form-select" required>
+                    <option value="DESC">Most Frequent</option>
+                    <option value="ASC">Least Frequent</option>
+                  </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h2 class="card-title">Most Recent Visitors</h2>
+              <p>View images of the 50 most recent birds visiting the feeder.</p>
+              <a href="{{ url_for('recent_records') }}" class="btn btn-primary">View Recent Birds</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
   </body>
-    <br>
-    <a href="{{ url_for('recent_records') }}">View Most Recent 50 Birds</a>
 </html>

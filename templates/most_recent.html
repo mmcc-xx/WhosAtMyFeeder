@@ -3,35 +3,45 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Recent Records</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" href="{{ url_for('static', filename='flutter_dash_black_24dp.svg') }}" type="image/svg+xml">
+    <title>Who's At My Feeder? - Most Recent Visitors</title>
   </head>
-  <body>
-    <h1>Most Recent 50 Dectections</h1>
-    <table>
-      <tr>
-        <th>ID</th>
-        <th>Detection Time</th>
-        <th>Detection Index</th>
-        <th>Score</th>
-        <th>Display Name</th>
-        <th>Common Names</th>
-        <th>Category Name</th>
-        <th>Image</th>
-      </tr>
-      {% for record, commonnames in zipped_data %}
-      <tr>
-        <td>{{ record[0] }}</td>
-        <td>{{ record[1] }}</td>
-        <td>{{ record[2] }}</td>
-        <td>{{ record[3] }}</td>
-        <td>{{ record[4] }}</td>
-        <td>{{'<br>'.join(commonnames)|safe}}</td>
-        <td>{{ record[5] }}</td>
-        <td>
-          <img src="data:image/jpeg;base64,{{ record[6] }}" alt="Image" width="200" />
-        </td>
-      </tr>
-      {% endfor %}
-    </table>
+  <body class="bg-light">
+    <div class="container py-5">
+      <h1 class="mb-4">Who's At My Feeder? - Most Recent Visitors</h1>
+      <div class="mb-3">
+        <a href="{{ url_for('index') }}" class="btn btn-primary">Go back to selection</a>
+      </div>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Detection Time</th>
+            <th>Score</th>
+            <th>Fancy Name</th>
+            <th>Common Names</th>
+            <th>Image</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for record, commonnames in zipped_data %}
+          <tr>
+            <td>{{ record[1]|datetime }}</td>
+            <td>{{ record[3] }}</td>
+            <td>{{ record[4] }}</td>
+            <td>{{'<br>'.join(commonnames)|safe}}</td>
+            <td>
+              <img src="data:image/jpeg;base64,{{ record[6] }}" alt="Image" width="200" />
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="mt-3">
+        <a href="{{ url_for('index') }}" class="btn btn-primary">Go back to selection</a>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
   </body>
 </html>
