@@ -12,6 +12,7 @@
       <h1 class="mb-4">Most Recent Visitors</h1>
       <div class="mb-3">
         <a href="{{ url_for('index') }}" class="btn btn-primary">Go back to selection</a>
+        <button type="button" class="btn btn-secondary" onclick="window.location.reload();">Refresh</button>
       </div>
       <table class="table">
         <thead>
@@ -27,7 +28,7 @@
           {% for record, commonnames in zipped_data %}
           <tr>
             <td>{{ record[1]|datetime }}</td>
-            <td>{{ record[3] }}</td>
+            <td>{{ "%.2f"|format(record[3]) }}</td>
             <td>{{ record[4] }}</td>
             <td>{{'<br>'.join(commonnames)|safe}}</td>
             <td>
