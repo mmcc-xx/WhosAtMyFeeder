@@ -15,10 +15,12 @@
         <a href="{{ url_for('index') }}" class="btn btn-secondary">Go back to selection</a>
       </div>
       <div class="row row-cols-1 row-cols-md-3 g-4">
-        {% for image, timestamp, score in images %}
+        {% for image, timestamp, score, record_id in images %}
         <div class="col">
           <div class="card h-100">
-            <img src="data:image/jpeg;base64,{{ image }}" alt="Image" class="card-img-top">
+            <a href="{{ url_for('bird_details', record_id=record_id) }}">
+              <img src="data:image/jpeg;base64,{{ image }}" alt="Image" class="card-img-top">
+            </a>
             <div class="card-body">
               <p class="card-text">Time: {{ timestamp|datetime(format='%H:%M:%S') }}</p>
               <p class="card-text">Score: {{ "%.2f"|format(score) }}</p>

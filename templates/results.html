@@ -24,13 +24,15 @@
           </tr>
         </thead>
         <tbody>
-          {% for row, image, commonnames in zipped_data %}
+          {% for row, image, commonnames, record_id in zipped_data %}
           <tr>
             <td><a href="{{ url_for('display_images', date=date, fancy_name=row[1]) }}">{{ row[1] }}</a></td>
             <td>{{'<br>'.join(commonnames)|safe}}</td>
             <td>{{ row[2] }}</td>
             <td>
-              <img src="data:image/jpeg;base64,{{ image }}" alt="Image" width="200" />
+              <a href="{{ url_for('bird_details', record_id=record_id) }}">
+                <img src="data:image/jpeg;base64,{{ image }}" alt="Image" width="200" />
+              </a>
             </td>
           </tr>
           {% endfor %}

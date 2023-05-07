@@ -18,7 +18,7 @@
               <form action="/" method="post">
                 <div class="mb-3">
                   <label for="date" class="form-label">Date:</label>
-                  <input type="date" id="date" name="date" class="form-control" value="{{ today }}" required>
+                  <input type="date" id="date" name="date" class="form-control" value="{{ today }}" max="{{ today }}" min="{{ min_date }}" required>
                 </div>
                 <div class="mb-3">
                   <label for="sort_order" class="form-label">Sort by:</label>

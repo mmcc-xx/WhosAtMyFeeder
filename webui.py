@@ -43,6 +43,26 @@ def get_common_names(scientific_name):
     return common_names
 
 
+def get_bird_record(record_id):
+    # Connect to the SQLite database
+    conn = sqlite3.connect('speciesid.db')
+    cursor = conn.cursor()
+
+    # Query the detections table to get the bird record by id
+    cursor.execute("SELECT * FROM detections WHERE id=?", (record_id,))
+    bird_record = cursor.fetchone()
+
+    # Get the common names using the get_common_names function
+    display_name = bird_record[4]
+    common_names = get_common_names(display_name)
+
+    # Close the connection
+    cursor.close()
+    conn.close()
+
+    return bird_record, common_names
+
+
 def get_most_recent_detections(limit=50):
     conn = sqlite3.connect("speciesid.db")
     cursor = conn.cursor()
@@ -83,22 +103,34 @@ def frequencies_by_date(date, sort_order):
 
     images = []
     commonnames = []
+    record_ids = []
     for row in rows:
         cursor.execute("""  
-            SELECT image  
+            SELECT image, id  
             FROM detections  
             WHERE category_name = ? AND score = ? AND date(detection_time) = ?  
         """, (row[0], row[3], date))
 
-        image_data = cursor.fetchone()[0]
+        returneddata = cursor.fetchone()
+        image_data = returneddata[0]
         images.append(base64.b64encode(image_data).decode("utf-8"))
         scientificname = row[1]
         commonname = get_common_names(scientificname)
 
         # This should be the list of common names associated with the sciency name
         commonnames.append(commonname)
+        record_ids.append(returneddata[1])
     conn.close()
-    return rows, images, commonnames
+    return rows, images, commonnames, record_ids
+
+
+def get_min_date():
+    conn = sqlite3.connect("speciesid.db")
+    cur = conn.cursor()
+    cur.execute("SELECT MIN(date(detection_time)) FROM detections")
+    min_date = cur.fetchone()[0]
+    conn.close()
+    return min_date
 
 
 @app.route('/mostrecent')
@@ -119,16 +151,17 @@ def index():
         sort_order = request.form['sort_order']
         return redirect(url_for('results', date=date, sort_order=sort_order))
 
+    min_date = get_min_date()
     today = datetime.now().strftime('%Y-%m-%d')
-    return render_template('index.html', today=today)
+    return render_template('index.html', today=today, min_date=min_date)
 
 
 @app.route('/results')
 def results():
     date = request.args.get('date', datetime.now().strftime('%Y-%m-%d'))
     sort_order = request.args.get('sort_order', 'DESC')
-    data, images, commonnames = frequencies_by_date(date, sort_order)
-    zipped_data = zip(data, images, commonnames)
+    data, images, commonnames, record_ids = frequencies_by_date(date, sort_order)
+    zipped_data = zip(data, images, commonnames, record_ids)
     return render_template('results.html', zipped_data=zipped_data, date=date, sort_order=sort_order)
 
 
@@ -142,9 +175,9 @@ def display_images(date, fancy_name):
 
     # Get images, timestamps, and scores for the specified date and fancy_name
     cur.execute(
-        "SELECT image, detection_time, score FROM detections WHERE date(detection_time) = ? AND display_name = ?",
+        "SELECT image, detection_time, score, id FROM detections WHERE date(detection_time) = ? AND display_name = ?",
         (date_obj.date(), fancy_name))
-    images = [(row[0], row[1], row[2]) for row in cur.fetchall()]
+    images = [(row[0], row[1], row[2], row[3]) for row in cur.fetchall()]
 
     conn.close()
     for i, image in enumerate(images):
@@ -152,6 +185,17 @@ def display_images(date, fancy_name):
         images[i][0] = base64.b64encode(image[0]).decode("utf-8")
 
     return render_template('image_grid.html', date=date, fancy_name=fancy_name, images=images)
+
+
+@app.route('/bird/<int:record_id>')
+def bird_details(record_id):
+    # Fetch the bird record based on the record_id
+    # You will need to implement get_bird_record function to fetch the record from your data
+    bird_record, common_names = get_bird_record(record_id)
+    bird_record = list(bird_record)
+    bird_record[6] = base64.b64encode(bird_record[6]).decode("utf-8")
+
+    return render_template('bird_details.html', bird_record=bird_record, common_names=common_names)
 
 
 def load_config():
