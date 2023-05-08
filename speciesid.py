@@ -11,6 +11,7 @@ import paho.mqtt.client as mqtt
 import hashlib
 import yaml
 from webui import app
+import sys
 
 classifier = None
 config = None
@@ -28,8 +29,7 @@ def classify(image):
 
 
 def on_connect(client, userdata, flags, rc):
-    print("MQTT Connected")
-    #client.subscribe("frigate/birdcam/bird/snapshot")
+    print("MQTT Connected", flush=True)
     client.subscribe(config['frigate']['main_topic'] + "/" +
                      config['frigate']['camera'] + "/" +
                      config['frigate']['object'] + "/" +
@@ -38,16 +38,16 @@ def on_connect(client, userdata, flags, rc):
 
 def on_disconnect(client, userdata, rc):
     if rc != 0:
-        print("Unexpected disconnection, trying to reconnect")
+        print("Unexpected disconnection, trying to reconnect", flush=True)
         while True:
             try:
                 client.reconnect()
                 break
             except Exception as e:
-                print(f"Reconnection failed due to {e}, retrying in 60 seconds")
+                print(f"Reconnection failed due to {e}, retrying in 60 seconds", flush=True)
                 time.sleep(60)
     else:
-        print("Expected disconnection")
+        print("Expected disconnection", flush=True)
 
 
 def on_message(client, userdata, message):
@@ -67,10 +67,10 @@ def on_message(client, userdata, message):
         current_time = now.strftime("%Y-%m-%d %H:%M:%S")
         result_text = current_time + "\n"
         result_text = result_text + str(category)
-        print(result_text)
+        print(result_text, flush=True)
 
         if index != 964 and score > config['classification']['threshold']:  # 964 is "background"
-            print('Storing...')
+            print('Storing...', flush=True)
             binaryimg = np_arr.tobytes()
             hash_object = hashlib.sha256()
             hash_object.update(binaryimg)
@@ -84,7 +84,7 @@ def on_message(client, userdata, message):
 
     else:
         firstmessage = False
-        print("skipping first message")
+        print("skipping first message", flush=True)
 
 
 def setupdb():
@@ -123,20 +123,32 @@ def load_config():
 
 
 def run_webui():
+    print("Starting flask app", flush=True)
     app.run(debug=False, host=config['webui']['host'], port=config['webui']['port'])
 
 
 def run_mqtt_client():
-    client = mqtt.Client("birdspeciesid")
+    print("Starting MQTT client. Connecting to: " + config['frigate']['mqtt_server'], flush=True)
+    now = datetime.now()
+    current_time = now.strftime("%Y%m%d%H%M%S")
+    client = mqtt.Client("birdspeciesid" + current_time)
     client.on_message = on_message
     client.on_disconnect = on_disconnect
     client.on_connect = on_connect
     client.connect(config['frigate']['mqtt_server'])
-
     client.loop_forever()
 
 
 def main():
+
+    now = datetime.now()
+    current_time = now.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+
+    print("Time: " + current_time, flush=True)
+    print("Python version", flush=True)
+    print(sys.version, flush=True)
+    print("Version info.", flush=True)
+    print(sys.version_info, flush=True)
 
     load_config()
 
@@ -156,6 +168,7 @@ def main():
 
     # setup database
     setupdb()
+    print("Starting threads for Flask and MQTT", flush=True)
     flask_process = multiprocessing.Process(target=run_webui)
     mqtt_process = multiprocessing.Process(target=run_mqtt_client)
 
@@ -167,4 +180,5 @@ def main():
 
 
 if __name__ == '__main__':
+    print("Calling Main", flush=True)
     main()

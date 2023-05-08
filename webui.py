@@ -205,6 +205,6 @@ def load_config():
         config = yaml.safe_load(config_file)
 
 
-if __name__ == '__main__':
-    load_config()
-    app.run(debug=True, host=config['webui']['host'], port=config['webui']['port'])
+#if __name__ == '__main__':
+    #load_config()
+    #app.run(debug=True, host=config['webui']['host'], port=config['webui']['port'])
