@@ -1,0 +1,13 @@
+version: "3.6"
+services:
+  whosatmyfeeder:
+    container_name: whosatmyfeeder
+    restart: unless-stopped
+    image: whosatmyfeeder:latest
+    volumes:
+      - ./config:/config
+      - ./speciesid.db:/speciesid.db
+    ports:
+      - 7766:7766 #port used by the webserver in the container is defined in config.
+    environment:
+      - TZ=America/New_York
