@@ -2,7 +2,7 @@ import sqlite3
 import numpy as np
 from datetime import datetime
 import time
-
+import multiprocessing
 import cv2
 from tflite_support.task import core
 from tflite_support.task import processor
@@ -10,9 +10,9 @@ from tflite_support.task import vision
 import paho.mqtt.client as mqtt
 import hashlib
 import yaml
+from webui import app
 
 classifier = None
-conn = None
 config = None
 firstmessage = True
 
@@ -51,6 +51,7 @@ def on_disconnect(client, userdata, rc):
 
 
 def on_message(client, userdata, message):
+    conn = sqlite3.connect("speciesid.db")
     global firstmessage
     if not firstmessage:
         np_arr = np.frombuffer(message.payload, dtype=np.uint8)
@@ -87,7 +88,7 @@ def on_message(client, userdata, message):
 
 
 def setupdb():
-    global conn
+
     conn = sqlite3.connect("speciesid.db")
     cursor = conn.cursor()
     cursor.execute("""  
@@ -104,12 +105,35 @@ def setupdb():
     """)
     conn.commit()
 
+    cursor.execute("""  
+        CREATE TABLE IF NOT EXISTS birdnames (  
+            id INTEGER PRIMARY KEY AUTOINCREMENT,  
+            scientific_name TEXT NOT NULL,  
+            common_names TEXT NOT NULL 
+        )  
+    """)
+    conn.commit()
+
 
 def load_config():
     global config
     file_path = './config/config.yml'
     with open(file_path, 'r') as config_file:
         config = yaml.safe_load(config_file)
+
+
+def run_webui():
+    app.run(debug=False, host=config['webui']['host'], port=config['webui']['port'])
+
+
+def run_mqtt_client():
+    client = mqtt.Client("birdspeciesid")
+    client.on_message = on_message
+    client.on_disconnect = on_disconnect
+    client.on_connect = on_connect
+    client.connect(config['frigate']['mqtt_server'])
+
+    client.loop_forever()
 
 
 def main():
@@ -132,14 +156,14 @@ def main():
 
     # setup database
     setupdb()
+    flask_process = multiprocessing.Process(target=run_webui)
+    mqtt_process = multiprocessing.Process(target=run_mqtt_client)
 
-    client = mqtt.Client("birdspeciesid")
-    client.on_message = on_message
-    client.on_disconnect = on_disconnect
-    client.on_connect = on_connect
-    client.connect(config['frigate']['mqtt_server'])
+    flask_process.start()
+    mqtt_process.start()
 
-    client.loop_forever()
+    flask_process.join()
+    mqtt_process.join()
 
 
 if __name__ == '__main__':

@@ -205,20 +205,6 @@ def load_config():
         config = yaml.safe_load(config_file)
 
 
-def setupdb():
-    conn = sqlite3.connect("speciesid.db")
-    cursor = conn.cursor()
-    cursor.execute("""  
-        CREATE TABLE IF NOT EXISTS birdnames (  
-            id INTEGER PRIMARY KEY AUTOINCREMENT,  
-            scientific_name TEXT NOT NULL,  
-            common_names TEXT NOT NULL 
-        )  
-    """)
-    conn.commit()
-
-
 if __name__ == '__main__':
     load_config()
-    setupdb()
     app.run(debug=True, host=config['webui']['host'], port=config['webui']['port'])

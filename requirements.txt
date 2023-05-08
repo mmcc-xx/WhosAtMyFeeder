@@ -1,0 +1,7 @@
+EcoNameTranslator==2.1
+Flask==2.3.2
+numpy==1.24.3
+opencv_python==4.7.0.72
+paho_mqtt==1.6.1
+PyYAML==6.0
+tflite_support==0.4.3
