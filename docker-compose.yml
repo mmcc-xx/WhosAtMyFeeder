@@ -3,7 +3,7 @@ services:
   whosatmyfeeder:
     container_name: whosatmyfeeder
     restart: unless-stopped
-    image: whosatmyfeeder:latest
+    image: mmcc73/whosatmyfeeder:latest
     volumes:
       - ./config:/config
       - ./speciesid.db:/speciesid.db
