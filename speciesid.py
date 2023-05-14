@@ -135,6 +135,12 @@ def run_mqtt_client():
     client.on_message = on_message
     client.on_disconnect = on_disconnect
     client.on_connect = on_connect
+    # check if we are using authentication and set username/password if so
+    if config['frigate']['mqtt_auth']:
+        username = config['frigate']['mqtt_username']
+        password = config['frigate']['mqtt_password']
+        client.username_pw_set(username, password)
+
     client.connect(config['frigate']['mqtt_server'])
     client.loop_forever()
 
