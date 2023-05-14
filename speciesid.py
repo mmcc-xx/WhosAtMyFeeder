@@ -17,6 +17,7 @@ classifier = None
 config = None
 firstmessage = True
 
+DBPATH = './data/speciesid.db'
 
 def classify(image):
 
@@ -51,7 +52,7 @@ def on_disconnect(client, userdata, rc):
 
 
 def on_message(client, userdata, message):
-    conn = sqlite3.connect("speciesid.db")
+    conn = sqlite3.connect(DBPATH)
     global firstmessage
     if not firstmessage:
         np_arr = np.frombuffer(message.payload, dtype=np.uint8)
@@ -89,7 +90,7 @@ def on_message(client, userdata, message):
 
 def setupdb():
 
-    conn = sqlite3.connect("speciesid.db")
+    conn = sqlite3.connect(DBPATH)
     cursor = conn.cursor()
     cursor.execute("""  
         CREATE TABLE IF NOT EXISTS detections (  

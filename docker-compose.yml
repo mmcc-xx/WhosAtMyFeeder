@@ -6,7 +6,7 @@ services:
     image: mmcc73/whosatmyfeeder:latest
     volumes:
       - ./config:/config
-      - ./speciesid.db:/speciesid.db
+      - ./data:/data
     ports:
       - 7766:7766 #port used by the webserver in the container is defined in config.
     environment:

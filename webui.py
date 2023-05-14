@@ -7,7 +7,7 @@ from EcoNameTranslator import to_common
 
 app = Flask(__name__)
 config = None
-
+DBPATH = './data/speciesid.db'
 
 def format_datetime(value, format='%B %d, %Y %H:%M:%S'):
     dt = datetime.strptime(value, '%Y-%m-%d %H:%M:%S.%f')  # Adjusted input format to include microseconds
@@ -18,7 +18,7 @@ app.jinja_env.filters['datetime'] = format_datetime
 
 
 def get_common_names(scientific_name):
-    conn = sqlite3.connect('speciesid.db')
+    conn = sqlite3.connect(DBPATH)
     cursor = conn.cursor()
 
     # Look up the scientific name in the birdnames table
@@ -45,7 +45,7 @@ def get_common_names(scientific_name):
 
 def get_bird_record(record_id):
     # Connect to the SQLite database
-    conn = sqlite3.connect('speciesid.db')
+    conn = sqlite3.connect(DBPATH)
     cursor = conn.cursor()
 
     # Query the detections table to get the bird record by id
@@ -64,7 +64,7 @@ def get_bird_record(record_id):
 
 
 def get_most_recent_detections(limit=50):
-    conn = sqlite3.connect("speciesid.db")
+    conn = sqlite3.connect(DBPATH)
     cursor = conn.cursor()
 
     cursor.execute("""  
@@ -87,7 +87,7 @@ def get_most_recent_detections(limit=50):
 
 
 def frequencies_by_date(date, sort_order):
-    conn = sqlite3.connect("speciesid.db")
+    conn = sqlite3.connect(DBPATH)
     cursor = conn.cursor()
 
     query = """  
@@ -125,7 +125,7 @@ def frequencies_by_date(date, sort_order):
 
 
 def get_min_date():
-    conn = sqlite3.connect("speciesid.db")
+    conn = sqlite3.connect(DBPATH)
     cur = conn.cursor()
     cur.execute("SELECT MIN(date(detection_time)) FROM detections")
     min_date = cur.fetchone()[0]
@@ -167,7 +167,7 @@ def results():
 
 @app.route('/display_images/<date>/<fancy_name>')
 def display_images(date, fancy_name):
-    conn = sqlite3.connect('speciesid.db')
+    conn = sqlite3.connect(DBPATH)
     cur = conn.cursor()
 
     # Convert date string to datetime object
