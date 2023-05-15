@@ -4,7 +4,8 @@ frigate:
   mqtt_username: username
   mqtt_password: password
   main_topic: frigate
-  camera: birdcam
+  camera:
+    - birdcam
   object: bird
 classification:
   model: model.tflite

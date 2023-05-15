@@ -19,6 +19,7 @@ firstmessage = True
 
 DBPATH = './data/speciesid.db'
 
+
 def classify(image):
 
     rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -31,10 +32,11 @@ def classify(image):
 
 def on_connect(client, userdata, flags, rc):
     print("MQTT Connected", flush=True)
-    client.subscribe(config['frigate']['main_topic'] + "/" +
-                     config['frigate']['camera'] + "/" +
-                     config['frigate']['object'] + "/" +
-                     'snapshot')
+    for camera in config['frigate']['camera']:
+        client.subscribe(config['frigate']['main_topic'] + "/" +
+                         camera + "/" +
+                         config['frigate']['object'] + "/" +
+                         'snapshot')
 
 
 def on_disconnect(client, userdata, rc):
