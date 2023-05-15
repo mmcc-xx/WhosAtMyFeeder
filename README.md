@@ -13,7 +13,8 @@ the docker-compose.yml file from here into that directory. Take a quick peek
 at that file and make any changes that might be needed, like the timezone.
 
 In your directory, make a directory called config, and copy config/config.yml from here
-into your config directory. Edit it to make changes for your setup. The model is already
+into your config directory. Edit it to make changes for your setup. You can add the names
+of multiple cameras to the camera array. The model is already
 in the image, so unless you want to use a different model, no need to change the
 model name.
 
