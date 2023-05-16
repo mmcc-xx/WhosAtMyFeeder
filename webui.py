@@ -3,7 +3,6 @@ import sqlite3
 import base64
 from datetime import datetime
 import yaml
-from EcoNameTranslator import to_common
 
 app = Flask(__name__)
 config = None
