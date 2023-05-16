@@ -8,6 +8,7 @@ from EcoNameTranslator import to_common
 app = Flask(__name__)
 config = None
 DBPATH = './data/speciesid.db'
+NAMEDBPATH = './birdnames.db'
 
 def format_datetime(value, format='%B %d, %Y %H:%M:%S'):
     dt = datetime.strptime(value, '%Y-%m-%d %H:%M:%S.%f')  # Adjusted input format to include microseconds
@@ -18,29 +19,22 @@ app.jinja_env.filters['datetime'] = format_datetime
 
 
 def get_common_names(scientific_name):
-    conn = sqlite3.connect(DBPATH)
+    conn = sqlite3.connect(NAMEDBPATH)
     cursor = conn.cursor()
 
-    # Look up the scientific name in the birdnames table
-    cursor.execute("SELECT common_names FROM birdnames WHERE scientific_name = ?;", (scientific_name,))
-    row = cursor.fetchone()
+    cursor.execute('''  
+        SELECT common_name FROM birdnames  
+        WHERE scientific_name = ?  
+    ''', (scientific_name,))
 
-    if row:
-        # If the scientific name is found, return the common names from the table
-        common_names_str = row[0]
-        common_names = common_names_str.split(',')
-    else:
-        # If the scientific name is not found, use the to_common() function to get the common names
-        common_names = to_common([scientific_name])[scientific_name][1]
-
-        # Store the common names in the birdnames table for faster access later
-        common_names_str = ','.join(common_names)
-        cursor.execute("INSERT INTO birdnames (scientific_name, common_names) VALUES (?, ?);",
-                       (scientific_name, common_names_str))
-        conn.commit()
+    result = cursor.fetchone()
 
     conn.close()
-    return common_names
+
+    if result:
+        return result[0]
+    else:
+        return "No common name found."
 
 
 def get_bird_record(record_id):
@@ -117,7 +111,7 @@ def frequencies_by_date(date, sort_order):
         scientificname = row[1]
         commonname = get_common_names(scientificname)
 
-        # This should be the list of common names associated with the sciency name
+        # This should be the common name associated with the sciency name
         commonnames.append(commonname)
         record_ids.append(returneddata[1])
     conn.close()

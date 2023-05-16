@@ -108,15 +108,6 @@ def setupdb():
     """)
     conn.commit()
 
-    cursor.execute("""  
-        CREATE TABLE IF NOT EXISTS birdnames (  
-            id INTEGER PRIMARY KEY AUTOINCREMENT,  
-            scientific_name TEXT NOT NULL,  
-            common_names TEXT NOT NULL 
-        )  
-    """)
-    conn.commit()
-
 
 def load_config():
     global config
