@@ -11,7 +11,7 @@
       <h1>{{ bird_record[4] }}</h1>
       <p><strong>Timestamp:</strong> {{ bird_record[1]|datetime }}</p>
       <p><strong>Score:</strong> {{ "%.2f"|format(bird_record[3]) }}</p>
-      <p><strong>Common Names:</strong> {{ '<br>'.join(common_names)|safe }}</p>
+      <p><strong>Common Names:</strong> {{ common_names }}</p>
       <img src="data:image/jpeg;base64,{{ bird_record[6] }}" alt="Image" width="500" />
       <div class="mt-3">
         <button class="btn btn-primary" onclick="history.back()">Go back</button>
