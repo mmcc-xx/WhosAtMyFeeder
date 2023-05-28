@@ -20,10 +20,10 @@ to send out [snapshots](https://docs.frigate.video/configuration/snapshots). Thi
 *Docker Config*
 
 Then, on the machine where you want to run this app, create a new directory. Copy
-the docker-compose.yml file from here into that directory. Take a quick peek
+the [docker-compose.yml](https://github.com/mmcc-xx/WhosAtMyFeeder/blob/master/docker-compose.yml) file from here into that directory. Take a quick peek
 at that file and make any changes that might be needed, like the timezone.
 
-In your directory, make a directory called config, and copy config/config.yml from here
+In your directory, make a directory called config, and copy [config/config.yml](https://github.com/mmcc-xx/WhosAtMyFeeder/blob/master/config/config.yml) from here
 into your config directory. Edit it to make changes for your setup. You can add the names
 of multiple cameras to the camera array. The model is already
 in the image, so unless you want to use a different model, no need to change the
