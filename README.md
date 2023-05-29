@@ -1,4 +1,3 @@
-echo "[rabbitmq_management,rabbitmq_prometheus,rabbitmq_mqtt]." > /mnt/user/appdata/rabbitmq/config/enabled_plugins
 # Who's At My Feeder?
 
 ![screenshot](screenshot.jpg)
