@@ -66,6 +66,10 @@ cameras:
             - record
     mqtt:
       enabled: True
+      bounding_box: False #this will get rid of the box around the bird. We already know it is a bird. Sheesh.
+      timestamp: False #this will get rid of the time stamp in the image. 
+      quality: 95 #default quality is 70, which will get you lots of compression artifacts
+      
 ```
 
 *Docker Config*
