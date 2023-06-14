@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}
+Detections of {{ common_name }} on {{ date }}
+{% endblock %}
+
+{% block content %}
+  <h1 class="mt-4">Detections of {{ common_name }} on {{ date }}</h1>
+  <table class="table table-striped mt-4">
+    <thead>
+      <tr>
+        <th>Detection Time</th>
+        <th>Camera Name</th>
+        <th>Score</th>
+        <th>Thumbnail</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for record in records %}
+        <tr>
+          <td>{{ record['detection_time'] }}</td>
+          <td>{{ record['camera_name'] }}</td>
+          <td>{{ '%.2f'|format(record['score']) }}</td>
+          <td>
+            <img src="{{ url_for('frigate_thumbnail', frigate_event=record['frigate_event']) }}" alt="Thumbnail" width="100" height="auto" class="thumbnail" onload="checkTransparentImage(this)" onclick="showSnapshot('{{ url_for('frigate_snapshot', frigate_event=record['frigate_event']) }}', '{{ url_for('frigate_clip', frigate_event=record['frigate_event']) }}')" />
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% include 'modals_and_scripts.html' %}
+{% endblock %}

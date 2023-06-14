@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Daily Summary for {{ date }}
+{% endblock %}
+
+{% block date_picker %}
+  <form class="d-flex">
+      <input type="date" id="date-picker" class="form-control" value="{{ date }}" min="{{ earliest_date }}" max="{{ today }}" onchange="navigateToDailySummary(this)" />
+  </form>
+{% endblock %}
+
+{% block content %}
+    <h2>Daily Summary for {{ date }}</h2>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">Common Name</th>
+            <th scope="col">Total</th>
+            {% for hour in range(24) %}
+                <th scope="col">
+                    <a href="{{ url_for('show_detections_by_hour', date=date, hour=hour) }}"
+                       class="text-decoration-none text-reset">
+                        {{ hour }}
+                    </a>
+                </th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for species in daily_summary.values() %}
+            <tr>
+                <td>
+                    <a href="{{ url_for('show_detections_by_scientific_name', scientific_name=species.scientific_name, date=date, end_date=None) }}"
+                       class="text-decoration-none text-reset">
+                        {{ species.common_name }}
+                    </a>
+                </td>
+                <td>{{ species.total_detections }}</td>
+                {% for detections in species.hourly_detections %}
+                    <td>
+                        {% if detections > 0 %}
+                            {{ detections }}
+                        {% endif %}
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    function navigateToDailySummary(input) {
+      const selectedDate = input.value;
+      window.location.href = `/daily_summary/${selectedDate}`;
+    }
+  </script>
+{% endblock %}

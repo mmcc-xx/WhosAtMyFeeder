@@ -12,6 +12,11 @@ import hashlib
 import yaml
 from webui import app
 import sys
+import json
+import requests
+from PIL import Image, ImageOps
+from io import BytesIO
+from queries import get_common_name
 
 classifier = None
 config = None
@@ -22,8 +27,7 @@ DBPATH = './data/speciesid.db'
 
 def classify(image):
 
-    rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    tensor_image = vision.TensorImage.create_from_array(rgb_image)
+    tensor_image = vision.TensorImage.create_from_array(image)
 
     categories = classifier.classify(tensor_image)
 
@@ -32,11 +36,9 @@ def classify(image):
 
 def on_connect(client, userdata, flags, rc):
     print("MQTT Connected", flush=True)
-    for camera in config['frigate']['camera']:
-        client.subscribe(config['frigate']['main_topic'] + "/" +
-                         camera + "/" +
-                         config['frigate']['object'] + "/" +
-                         'snapshot')
+
+    # we are going subscribe to frigate/events and look for bird detections there
+    client.subscribe(config['frigate']['main_topic'] + "/events")
 
 
 def on_disconnect(client, userdata, rc):
@@ -53,61 +55,160 @@ def on_disconnect(client, userdata, rc):
         print("Expected disconnection", flush=True)
 
 
+def set_sublabel(frigate_url, frigate_event, sublabel):
+    post_url = frigate_url + "/api/events/" + frigate_event + "/sub_label"
+
+    # frigate limits sublabels to 20 characters currently
+    if len(sublabel) > 20:
+        sublabel = sublabel[:20]
+
+        # Create the JSON payload
+    payload = {
+        "subLabel": sublabel
+    }
+
+    # Set the headers for the request
+    headers = {
+        "Content-Type": "application/json"
+    }
+
+    # Submit the POST request with the JSON payload
+    response = requests.post(post_url, data=json.dumps(payload), headers=headers)
+
+    # Check for a successful response
+    if response.status_code == 200:
+        print("Sublabel set successfully to: " + sublabel, flush=True)
+    else:
+        print("Failed to set sublabel. Status code:", response.status_code, flush=True)
+
+
 def on_message(client, userdata, message):
     conn = sqlite3.connect(DBPATH)
+
     global firstmessage
     if not firstmessage:
-        np_arr = np.frombuffer(message.payload, dtype=np.uint8)
-        img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
-        categories = classify(img)
-        category = categories[0]
-        index = category.index
-        score = category.score
-        display_name = category.display_name
-        category_name = category.category_name
 
-        now = datetime.now()
-        current_time = now.strftime("%Y-%m-%d %H:%M:%S")
-        result_text = current_time + "\n"
-        result_text = result_text + str(category)
-        print(result_text, flush=True)
+        # Convert the MQTT payload to a Python dictionary
+        payload_dict = json.loads(message.payload)
 
-        if index != 964 and score > config['classification']['threshold']:  # 964 is "background"
-            print('Storing...', flush=True)
-            binaryimg = np_arr.tobytes()
-            hash_object = hashlib.sha256()
-            hash_object.update(binaryimg)
-            hash_hex = hash_object.hexdigest()
-            cursor = conn.cursor()
-            cursor.execute("""  
-                 INSERT OR IGNORE INTO detections (detection_time, detection_index, score,
-                 display_name, category_name, image, image_hash) VALUES (?, ?, ?, ?, ?, ?, ?)  
-                 """, (now, index, score, display_name, category_name, binaryimg, hash_hex))
-            conn.commit()
+        # Extract the 'after' element data and store it in a dictionary
+        after_data = payload_dict.get('after', {})
+
+        if (after_data['camera'] in config['frigate']['camera'] and
+                after_data['label'] == 'bird'):
+
+            frigate_event = after_data['id']
+            frigate_url = config['frigate']['frigate_url']
+            snapshot_url = frigate_url + "/api/events/" + frigate_event + "/snapshot.jpg"
+
+            print("Getting image for event: " + frigate_event, flush=True)
+            print("Here's the URL: " + snapshot_url, flush=True)
+            # Send a GET request to the snapshot_url
+            params = {
+                "crop": 1,
+                "quality": 95
+            }
+            response = requests.get(snapshot_url, params=params)
+            # Check if the request was successful (HTTP status code 200)
+            if response.status_code == 200:
+                # Open the image from the response content and convert it to a NumPy array
+                image = Image.open(BytesIO(response.content))
+
+                file_path = "fullsized.jpg"  # Change this to your desired file path
+                image.save(file_path, format="JPEG")  # You can change the format if needed
+
+                # Resize the image while maintaining its aspect ratio
+                max_size = (224, 224)
+                image.thumbnail(max_size)
+
+                # Pad the image to fill the remaining space
+                padded_image = ImageOps.expand(image, border=((max_size[0] - image.size[0]) // 2,
+                                                              (max_size[1] - image.size[1]) // 2),
+                                               fill='black')  # Change the fill color if necessary
+
+                file_path = "shrunk.jpg"  # Change this to your desired file path
+                padded_image.save(file_path, format="JPEG")  # You can change the format if needed
+
+                np_arr = np.array(padded_image)
+
+                categories = classify(np_arr)
+                category = categories[0]
+                index = category.index
+                score = category.score
+                display_name = category.display_name
+                category_name = category.category_name
+
+                start_time = datetime.fromtimestamp(after_data['start_time'])
+                formatted_start_time = start_time.strftime("%Y-%m-%d %H:%M:%S")
+                result_text = formatted_start_time + "\n"
+                result_text = result_text + str(category)
+                print(result_text, flush=True)
+
+                if index != 964 and score > config['classification']['threshold']:  # 964 is "background"
+
+                    cursor = conn.cursor()
+
+                    # Check if a record with the given frigate_event exists
+                    cursor.execute("SELECT * FROM detections WHERE frigate_event = ?", (frigate_event,))
+                    result = cursor.fetchone()
+
+                    if result is None:
+                        # Insert a new record if it doesn't exist
+                        print("No record yet for this event. Storing.", flush=True)
+                        cursor.execute("""  
+                            INSERT INTO detections (detection_time, detection_index, score,  
+                            display_name, category_name, frigate_event, camera_name) VALUES (?, ?, ?, ?, ?, ?, ?)  
+                            """, (formatted_start_time, index, score, display_name, category_name, frigate_event, after_data['camera']))
+                        # set the sublabel
+                        set_sublabel(frigate_url, frigate_event, get_common_name(display_name))
+                    else:
+                        print("There is already a record for this event. Checking score", flush=True)
+                        # Update the existing record if the new score is higher
+                        existing_score = result[3]
+                        if score > existing_score:
+                            print("New score is higher. Updating record with higher score.", flush=True)
+                            cursor.execute("""  
+                                UPDATE detections  
+                                SET detection_time = ?, detection_index = ?, score = ?, display_name = ?, category_name = ?  
+                                WHERE frigate_event = ?  
+                                """, (formatted_start_time, index, score, display_name, category_name, frigate_event))
+                            # set the sublabel
+                            set_sublabel(frigate_url, frigate_event, get_common_name(display_name))
+                        else:
+                            print("New score is lower.", flush=True)
+
+                    # Commit the changes
+                    conn.commit()
+
+
+            else:
+                print(f"Error: Could not retrieve the image. Status code: {response.status_code}", flush=True)
 
     else:
         firstmessage = False
         print("skipping first message", flush=True)
 
+    conn.close()
+
 
 def setupdb():
-
     conn = sqlite3.connect(DBPATH)
     cursor = conn.cursor()
-    cursor.execute("""  
-        CREATE TABLE IF NOT EXISTS detections (  
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            detection_time TIMESTAMP NOT NULL,
-            detection_index INTEGER NOT NULL,
-            score REAL NOT NULL,
-            display_name TEXT NOT NULL,
-            category_name TEXT NOT NULL,
-            image BLOB NOT NULL,
-            image_hash TEXT NOT NULL UNIQUE
-        )  
+    cursor.execute("""    
+        CREATE TABLE IF NOT EXISTS detections (    
+            id INTEGER PRIMARY KEY AUTOINCREMENT,  
+            detection_time TIMESTAMP NOT NULL,  
+            detection_index INTEGER NOT NULL,  
+            score REAL NOT NULL,  
+            display_name TEXT NOT NULL,  
+            category_name TEXT NOT NULL,  
+            frigate_event TEXT NOT NULL UNIQUE,
+            camera_name TEXT NOT NULL 
+        )    
     """)
     conn.commit()
 
+    conn.close()
 
 def load_config():
     global config
@@ -170,13 +271,13 @@ def main():
     setupdb()
     print("Starting threads for Flask and MQTT", flush=True)
     flask_process = multiprocessing.Process(target=run_webui)
-    mqtt_process = multiprocessing.Process(target=run_mqtt_client)
+    # mqtt_process = multiprocessing.Process(target=run_mqtt_client)
 
     flask_process.start()
-    mqtt_process.start()
+    # mqtt_process.start()
 
     flask_process.join()
-    mqtt_process.join()
+    # mqtt_process.join()
 
 
 if __name__ == '__main__':
