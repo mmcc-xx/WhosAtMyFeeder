@@ -14,7 +14,7 @@ Actually I'm populating it with the first 20 characters of the bird species comm
 field is currently limited to 20 characters
 * I also changed (improved, I hope) the UI significantly. I don't think there's any lost functionality.
 
-![screenshot](screenshot.jpg)
+![screenshot](screenshot2.jpg)
 
 This app acts as sidecar to [Frigate](https://frigate.video/) to identify the species of
 the birds that Frigate detects.
