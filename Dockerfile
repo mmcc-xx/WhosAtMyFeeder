@@ -6,6 +6,7 @@ COPY model.tflite .
 COPY birdnames.db .
 COPY speciesid.py .
 COPY webui.py .
+COPY queries.py .
 COPY templates/ ./templates/
 COPY static/ ./static/
 

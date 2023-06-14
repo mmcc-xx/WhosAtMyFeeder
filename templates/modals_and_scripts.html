@@ -68,4 +68,10 @@
             img.onclick = null;
         }
     }
+
+    document.getElementById("videoModal").addEventListener("hidden.bs.modal", function () {
+        var videoClip = document.getElementById("videoClip");
+        videoClip.pause(); // Pause the video playback
+        videoClip.currentTime = 0; // Reset the video playback time to the beginning
+    });
 </script>

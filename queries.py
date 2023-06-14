@@ -151,11 +151,10 @@ def get_records_for_scientific_name_and_date(scientific_name, date):
 def get_earliest_detection_date():
     conn = sqlite3.connect(DBPATH)
     cursor = conn.cursor()
-    cursor.execute("SELECT MIN(detection_time) FROM detections")
+    cursor.execute("SELECT MIN(date(detection_time)) FROM detections")
     earliest_date = cursor.fetchone()[0]
     conn.close()
     if earliest_date:
-        earliest_date_datetime = datetime.strptime(earliest_date, "%Y-%m-%d %H:%M:%S.%f")
-        return earliest_date_datetime.strftime("%Y-%m-%d")
+        return earliest_date
     else:
         return None

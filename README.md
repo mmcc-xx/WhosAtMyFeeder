@@ -1,4 +1,18 @@
 # Who's At My Feeder?
+##What's New?
+I'm just about to push a significant update. This will require you to...
+* Delete you current speciesid.db database. If you are attached to that data, just move it somewhere else
+* Update your config.yml file to specify the url of your frigate installation, e.g. http://192.168.1.75:5000
+
+Why the changes? I have updated the app in a number of ways...
+* I'm no longer saving images as Frigate already has them. The images you see in the app now come right from Frigate
+* You'll also be able to view the video clip associated with a detection
+* There will a maximum of 1 detection stored per Frigate event. This app looks at every snapshot that Frigate provides and
+saves the ID with the best score.
+* I'm populating the Frigate sub-label for events in which a bird species is IDs with a score above the configured threshold.
+Actually I'm populating it with the first 20 characters of the bird species common name because apparently the sub label
+field is currently limited to 20 characters
+* I also changed (improved, I hope) the UI significantly. I don't think there's any lost functionality.
 
 ![screenshot](screenshot.jpg)
 

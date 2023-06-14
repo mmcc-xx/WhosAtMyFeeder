@@ -271,13 +271,13 @@ def main():
     setupdb()
     print("Starting threads for Flask and MQTT", flush=True)
     flask_process = multiprocessing.Process(target=run_webui)
-    # mqtt_process = multiprocessing.Process(target=run_mqtt_client)
+    mqtt_process = multiprocessing.Process(target=run_mqtt_client)
 
     flask_process.start()
-    # mqtt_process.start()
+    mqtt_process.start()
 
     flask_process.join()
-    # mqtt_process.join()
+    mqtt_process.join()
 
 
 if __name__ == '__main__':
