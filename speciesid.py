@@ -1,5 +1,6 @@
 import json
 import multiprocessing
+import os
 import sqlite3
 import sys
 import time
@@ -258,7 +259,7 @@ def setupdb():
 
 def load_config():
     global config
-    file_path = "./config/config.yml"
+    file_path = os.getenv("CONFIG_PATH", "./config/config.yml")
     with open(file_path, "r") as config_file:
         config = yaml.safe_load(config_file)
 
