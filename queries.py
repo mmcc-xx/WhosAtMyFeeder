@@ -1,16 +1,18 @@
 import sqlite3
 from collections import defaultdict
-from datetime import datetime
 
-DBPATH = './data/speciesid.db'
-NAMEDBPATH = './birdnames.db'
+DBPATH = "./data/speciesid.db"
+NAMEDBPATH = "./birdnames.db"
 
 
 def get_common_name(scientific_name):
     conn = sqlite3.connect(NAMEDBPATH)
     cursor = conn.cursor()
 
-    cursor.execute("SELECT common_name FROM birdnames WHERE scientific_name = ?", (scientific_name,))
+    cursor.execute(
+        "SELECT common_name FROM birdnames WHERE scientific_name = ?",
+        (scientific_name,),
+    )
     result = cursor.fetchone()
 
     conn.close()
@@ -18,7 +20,7 @@ def get_common_name(scientific_name):
     if result:
         return result[0]
     else:
-        print ("No common name for: " + scientific_name, flush=True)
+        print("No common name for: " + scientific_name, flush=True)
         return "No common name found."
 
 
@@ -26,7 +28,10 @@ def recent_detections(num_detections):
     conn = sqlite3.connect(DBPATH)
     cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM detections ORDER BY detection_time DESC LIMIT ?", (num_detections,))
+    cursor.execute(
+        "SELECT * FROM detections ORDER BY detection_time DESC LIMIT ?",
+        (num_detections,),
+    )
     results = cursor.fetchall()
 
     conn.close()
@@ -34,15 +39,15 @@ def recent_detections(num_detections):
     formatted_results = []
     for result in results:
         detection = {
-            'id': result[0],
-            'detection_time': result[1],
-            'detection_index': result[2],
-            'score': result[3],
-            'display_name': result[4],
-            'category_name': result[5],
-            'frigate_event': result[6],
-            'camera_name': result[7],
-            'common_name': get_common_name(result[4])
+            "id": result[0],
+            "detection_time": result[1],
+            "detection_index": result[2],
+            "score": result[3],
+            "display_name": result[4],
+            "category_name": result[5],
+            "frigate_event": result[6],
+            "camera_name": result[7],
+            "common_name": get_common_name(result[4]),
         }
         formatted_results.append(detection)
 
@@ -50,12 +55,12 @@ def recent_detections(num_detections):
 
 
 def get_daily_summary(date):
-    date_str = date.strftime('%Y-%m-%d')
+    date_str = date.strftime("%Y-%m-%d")
     conn = sqlite3.connect(DBPATH)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
-    query = '''  
+    query = """  
         SELECT display_name,  
                COUNT(*) AS total_detections,  
                STRFTIME('%H', detection_time) AS hour,  
@@ -67,24 +72,28 @@ def get_daily_summary(date):
         ) AS subquery  
         GROUP BY display_name, hour  
         ORDER BY total_detections DESC, display_name, hour  
-    '''
+    """
 
     cursor.execute(query, (date_str,))
     rows = cursor.fetchall()
 
-    summary = defaultdict(lambda: {
-        'scientific_name': '',
-        'common_name': '',
-        'total_detections': 0,
-        'hourly_detections': [0] * 24
-    })
+    summary = defaultdict(
+        lambda: {
+            "scientific_name": "",
+            "common_name": "",
+            "total_detections": 0,
+            "hourly_detections": [0] * 24,
+        }
+    )
 
     for row in rows:
-        display_name = row['display_name']
-        summary[display_name]['scientific_name'] = display_name
-        summary[display_name]['common_name'] = get_common_name(display_name)
-        summary[display_name]['total_detections'] += row['hourly_detections']
-        summary[display_name]['hourly_detections'][int(row['hour'])] = row['hourly_detections']
+        display_name = row["display_name"]
+        summary[display_name]["scientific_name"] = display_name
+        summary[display_name]["common_name"] = get_common_name(display_name)
+        summary[display_name]["total_detections"] += row["hourly_detections"]
+        summary[display_name]["hourly_detections"][int(row["hour"])] = row[
+            "hourly_detections"
+        ]
 
     conn.close()
     return dict(summary)
@@ -96,12 +105,12 @@ def get_records_for_date_hour(date, hour):
     cursor = conn.cursor()
 
     # The SQL query to fetch records for the given date and hour, sorted by detection_time
-    query = '''    
+    query = """    
         SELECT *    
         FROM detections    
         WHERE strftime('%Y-%m-%d', detection_time) = ? AND strftime('%H', detection_time) = ?    
         ORDER BY detection_time    
-    '''
+    """
 
     cursor.execute(query, (date, str(hour).zfill(2)))
     records = cursor.fetchall()
@@ -109,9 +118,13 @@ def get_records_for_date_hour(date, hour):
     # Append the common name for each record
     result = []
     for record in records:
-        common_name = get_common_name(record['display_name'])  # Access the field by name
+        common_name = get_common_name(
+            record["display_name"]
+        )  # Access the field by name
         record_dict = dict(record)  # Convert the record to a dictionary
-        record_dict['common_name'] = common_name  # Add the 'common_name' key to the record dictionary
+        record_dict[
+            "common_name"
+        ] = common_name  # Add the 'common_name' key to the record dictionary
         result.append(record_dict)
 
     conn.close()
@@ -125,12 +138,12 @@ def get_records_for_scientific_name_and_date(scientific_name, date):
     cursor = conn.cursor()
 
     # The SQL query to fetch records for the given display_name and date, sorted by detection_time
-    query = '''    
+    query = """    
         SELECT *    
         FROM detections    
         WHERE display_name = ? AND strftime('%Y-%m-%d', detection_time) = ?    
         ORDER BY detection_time    
-    '''
+    """
 
     cursor.execute(query, (scientific_name, date))
     records = cursor.fetchall()
@@ -138,9 +151,13 @@ def get_records_for_scientific_name_and_date(scientific_name, date):
     # Append the common name for each record
     result = []
     for record in records:
-        common_name = get_common_name(record['display_name'])  # Access the field by name
+        common_name = get_common_name(
+            record["display_name"]
+        )  # Access the field by name
         record_dict = dict(record)  # Convert the record to a dictionary
-        record_dict['common_name'] = common_name  # Add the 'common_name' key to the record dictionary
+        record_dict[
+            "common_name"
+        ] = common_name  # Add the 'common_name' key to the record dictionary
         result.append(record_dict)
 
     conn.close()
