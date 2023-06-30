@@ -1,8 +1,11 @@
 import sqlite3
 from collections import defaultdict
 
-DBPATH = "./data/speciesid.db"
-NAMEDBPATH = "./birdnames.db"
+from util import load_config
+
+config = load_config()
+DBPATH = config["database"]["path"]
+NAMEDBPATH = config["classification"]["name_database"]
 
 
 def get_common_name(scientific_name):

@@ -1,19 +1,18 @@
-import os
 from datetime import datetime
 
 import requests
-import yaml
 from flask import Flask, abort, render_template, send_file, send_from_directory
 
 from queries import (get_common_name, get_daily_summary,
                      get_earliest_detection_date, get_records_for_date_hour,
                      get_records_for_scientific_name_and_date,
                      recent_detections)
+from util import load_config
 
 app = Flask(__name__)
-config = None
-DBPATH = "./data/speciesid.db"
-NAMEDBPATH = "./birdnames.db"
+config = load_config()
+DBPATH = config["database"]["path"]
+NAMEDBPATH = config["classification"]["name_database"]
 
 
 def format_datetime(value, format="%B %d, %Y %H:%M:%S"):
@@ -144,14 +143,3 @@ def show_daily_summary(date):
         today=today,
         earliest_date=earliest_date,
     )
-
-
-def load_config():
-    global config
-    file_path = os.getenv("CONFIG_PATH", "./config/config.yml")
-    with open(file_path, "r") as config_file:
-        config = yaml.safe_load(config_file)
-    return config
-
-
-load_config()

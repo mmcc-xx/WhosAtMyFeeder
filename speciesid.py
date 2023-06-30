@@ -13,13 +13,14 @@ from PIL import Image, ImageOps
 from tflite_support.task import core, processor, vision
 
 from queries import get_common_name
-from webui import app, load_config
+from util import load_config
+from webui import app
 
 classifier = None
 config = load_config()
 firstmessage = True
 
-DBPATH = "./data/speciesid.db"
+DBPATH = config["database"]["path"]
 
 
 def classify(image):
