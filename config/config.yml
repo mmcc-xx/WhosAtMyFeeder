@@ -10,7 +10,10 @@ frigate:
   object: bird
 classification:
   model: model.tflite
+  name_database: birdnames.db
   threshold: 0.7
+database:
+  path: "./data/speciesid.db"
 webui:
   port: 7766
   host: 0.0.0.0
