@@ -28,10 +28,10 @@
                 <td>{{ detection.common_name }}</td>
                 <td>{{ '%.2f'|format(detection.score) }}</td>
                 <td>
-                    <img src="{{ url_for('frigate_thumbnail', frigate_event=detection.frigate_event) }}" alt="Thumbnail"
+                    <img src=".{{ url_for('frigate_thumbnail', frigate_event=detection.frigate_event) }}" alt="Thumbnail"
      width="100" height="auto" class="thumbnail"
      onload="checkTransparentImage(this)"
-     onclick="showSnapshot('{{ url_for('frigate_snapshot', frigate_event=detection.frigate_event) }}', '{{ url_for('frigate_clip', frigate_event=detection.frigate_event) }}')"/>
+     onclick="showSnapshot('.{{ url_for('frigate_snapshot', frigate_event=detection.frigate_event) }}', '.{{ url_for('frigate_clip', frigate_event=detection.frigate_event) }}')"/>
                 </td>
             </tr>
         {% endfor %}
@@ -46,7 +46,7 @@
             <th scope="col">Total</th>
             {% for hour in range(current_hour + 1) %}
                 <th scope="col">
-                    <a href="{{ url_for('show_detections_by_hour', date=date, hour=hour) }}"
+                    <a href=".{{ url_for('show_detections_by_hour', date=date, hour=hour) }}"
                        class="text-decoration-none text-reset">
                         {{ hour }}
                     </a>
@@ -58,7 +58,7 @@
         {% for species in daily_summary.values() %}
             <tr>
                 <td>
-                    <a href="{{ url_for('show_detections_by_scientific_name', scientific_name=species.scientific_name, date=date, end_date=None) }}"
+                    <a href=".{{ url_for('show_detections_by_scientific_name', scientific_name=species.scientific_name, date=date, end_date=None) }}"
                        class="text-decoration-none text-reset">
                         {{ species.common_name }}
                     </a>
@@ -83,7 +83,7 @@
     <script>
         function navigateToDailySummary(input) {
             const selectedDate = input.value;
-            window.location.href = `/daily_summary/${selectedDate}`;
+            window.location.href = `./daily_summary/${selectedDate}`;
         }
     </script>
 {% endblock %}
