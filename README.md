@@ -1,8 +1,9 @@
 # Who's At My Feeder?
-##What's New?
+## What's New?
 I'm just about to push a significant update. This will require you to...
 * Delete you current speciesid.db database. If you are attached to that data, just move it somewhere else
 * Update your config.yml file to specify the url of your frigate installation, e.g. http://192.168.1.75:5000
+  * For those using HAOS add-ons for their Frigate install and possibly running WhosAtMyFeeder on a different box, by default HA doesn't expose port 5000 for Frigate. You have to explicitly configure the Frigate add-on to expose it by going to the Frigate add-on -> Configuration tab and under network add port 5000 against the "Web Interface" config. Without this, it's only exposed internally and not on your wider network and thus won't work.
 
 Why the changes? I have updated the app in a number of ways...
 * I'm no longer saving images as Frigate already has them. The images you see in the app now come right from Frigate
@@ -14,10 +15,10 @@ Actually I'm populating it with the first 20 characters of the bird species comm
 field is currently limited to 20 characters
 * I also changed (improved, I hope) the UI significantly. I don't think there's any lost functionality.
 
-![screenshot](screenshot.jpg)
+![screenshot](screenshot2.jpg)
 
 This app acts as sidecar to [Frigate](https://frigate.video/) to identify the species of
-the birds that Frigate detects.
+the birds that Frigate detects. It is using the bird species classifier model found here: https://tfhub.dev/google/lite-model/aiy/vision/classifier/birds_V1/3
 
 **Prequisites**
 
