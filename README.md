@@ -18,7 +18,7 @@ field is currently limited to 20 characters
 ![screenshot](screenshot2.jpg)
 
 This app acts as sidecar to [Frigate](https://frigate.video/) to identify the species of
-the birds that Frigate detects.
+the birds that Frigate detects. It is using the bird species classifier model found here: https://tfhub.dev/google/lite-model/aiy/vision/classifier/birds_V1/3
 
 **Prequisites**
 
