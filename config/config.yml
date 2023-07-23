@@ -12,5 +12,5 @@ classification:
   model: model.tflite
   threshold: 0.7
 webui:
-  port: 7767
+  port: 7766
   host: 0.0.0.0
