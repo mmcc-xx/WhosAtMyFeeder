@@ -5,3 +5,4 @@ paho_mqtt==1.6.1
 PyYAML==6.0
 tflite_support==0.4.3
 requests==2.30.0
+Pillow==9.5.0

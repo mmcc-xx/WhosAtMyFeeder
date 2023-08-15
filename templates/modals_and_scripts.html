@@ -1,0 +1,77 @@
+<!-- Snapshot Modal -->
+<div class="modal fade" id="snapshotModal" tabindex="-1" aria-labelledby="snapshotModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="snapshotModalLabel">Snapshot</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <img id="snapshotImage" src="" alt="Snapshot" class="img-fluid mb-3"/>
+                <button type="button" class="btn btn-primary" onclick="showVideo()">View Video</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Video Modal -->
+<div class="modal fade" id="videoModal" tabindex="-1" aria-labelledby="videoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="videoModalLabel">Video Clip</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <video id="videoClip" width="100%" controls>
+                    <source src="" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var currentClipUrl;
+
+    function showSnapshot(snapshotUrl, clipUrl) {
+        document.getElementById("snapshotImage").src = snapshotUrl;
+        currentClipUrl = clipUrl;
+        var snapshotModal = new bootstrap.Modal(document.getElementById("snapshotModal"));
+        snapshotModal.show();
+    }
+
+    function showVideo() {
+        var videoClip = document.getElementById("videoClip");
+        videoClip.src = currentClipUrl;
+        videoClip.load();
+        var snapshotModal = bootstrap.Modal.getInstance(document.getElementById("snapshotModal"));
+        snapshotModal.hide();
+        var videoModal = new bootstrap.Modal(document.getElementById("videoModal"));
+        videoModal.show();
+    }
+
+    function checkTransparentImage(img) {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0, img.width, img.height);
+        const pixelData = ctx.getImageData(0, 0, 1, 1).data;
+
+        // Check if the image is a transparent pixel
+        if (pixelData[0] === 0 && pixelData[1] === 0 && pixelData[2] === 0 && pixelData[3] === 0) {
+            // Hide the image and remove its onclick attribute
+            img.style.display = "none";
+            img.onclick = null;
+        }
+    }
+
+    document.getElementById("videoModal").addEventListener("hidden.bs.modal", function () {
+        var videoClip = document.getElementById("videoClip");
+        videoClip.pause(); // Pause the video playback
+        videoClip.currentTime = 0; // Reset the video playback time to the beginning
+    });
+</script>

@@ -1,4 +1,5 @@
 frigate:
+  frigate_url: http://192.168.1.75:5000
   mqtt_server: 192.168.1.75
   mqtt_auth: false
   mqtt_username: username
