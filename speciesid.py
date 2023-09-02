@@ -23,6 +23,8 @@ config = None
 firstmessage = True
 
 DBPATH = './data/speciesid.db'
+DEFAULT_MQTT_PORT = 1833
+DEFAULT_INSECURE_TLS = False
 
 
 def classify(image):
@@ -236,7 +238,14 @@ def run_mqtt_client():
         password = config['frigate']['mqtt_password']
         client.username_pw_set(username, password)
 
-    client.connect(config['frigate']['mqtt_server'])
+    mqtt_port = config['frigate'].get('mqtt_port', DEFAULT_MQTT_PORT)
+    if config['frigate'].get('mqtt_use_tls', False):
+        ca_certs = config['frigate'].get('mqtt_tls_ca_certs')
+        client.tls_set(ca_certs)
+        client.tls_insecure_set(config['frigate'].get('mqtt_tls_insecure',
+                                                      DEFAULT_INSECURE_TLS))
+
+    client.connect(config['frigate']['mqtt_server'], mqtt_port)
     client.loop_forever()
 
 
