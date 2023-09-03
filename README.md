@@ -116,3 +116,7 @@ http://127.0.0.1:7766 or on http://yourserveraddress:7766
 
 **Docker Image**
 The image is on Docker Hub at https://hub.docker.com/r/mmcc73/whosatmyfeeder
+
+## Contibuiting
+Use [pre-commit](https://pre-commit.com/) hooks before opening a pull requests.
+Install pre-commit with `pip install pre-commit` and activate with `pre-commit install`.
