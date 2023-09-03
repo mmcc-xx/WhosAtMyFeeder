@@ -20,7 +20,7 @@ field is currently limited to 20 characters
 This app acts as sidecar to [Frigate](https://frigate.video/) to identify the species of
 the birds that Frigate detects. It is using the bird species classifier model found here: https://tfhub.dev/google/lite-model/aiy/vision/classifier/birds_V1/3
 
-**Prequisites**
+**Prerequisites**
 
 1. A working & Accessible Frigate Installation with at least 1 Camera configured
 2. A MQTT Broker that Frigate successfully connects to
