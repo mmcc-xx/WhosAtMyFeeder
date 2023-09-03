@@ -1,0 +1,41 @@
+name: Pre-Commit
+
+on:
+  workflow_call:
+    inputs:
+      PYTHON_VERSION_DEFAULT:
+        description: Default Python version
+        required: false
+        default: 3.11
+        type: string
+
+
+jobs:
+  # Separate job to pre-populate the base dependency cache
+  # This prevent upcoming jobs to do the same individually
+  pre-commit:
+    name: Run pre-commit checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code from GitHub
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ inputs.PYTHON_VERSION_DEFAULT }}
+        id: python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ inputs.PYTHON_VERSION_DEFAULT }}
+          allow-prereleases: true
+
+      - name: Create Python virtual environment
+        run: |
+          python -m venv venv
+          . venv/bin/activate
+          pip install -U pip setuptools pre-commit
+          pre-commit install-hooks
+
+      - name: Run pre-commit checks
+        run: |
+          . venv/bin/activate
+          pre-commit run --show-diff-on-failure --color=always --all-files
+

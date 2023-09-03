@@ -1,0 +1,16 @@
+name: CI
+
+
+on:
+  push:
+  pull_request: ~
+  workflow_dispatch:
+
+
+jobs:
+  lint:
+    name: Run pre-commit checks
+    uses: ./.github/workflows/pre-commit.yaml
+    with:
+      PYTHON_VERSION_DEFAULT: "3.11"
+
