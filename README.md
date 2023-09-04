@@ -115,7 +115,7 @@ If you used the default config file and default docker-compose file you should b
 http://127.0.0.1:7766 or on http://yourserveraddress:7766
 
 **Docker Image**
-The image is on Docker Hub at https://hub.docker.com/r/mmcc73/whosatmyfeeder
+The image is on GitHub Container Registry `docker pull ghcr.io/mmcc-xx/whosatmyfeeder:latest`
 
 ## Contibuiting
 Use [pre-commit](https://pre-commit.com/) hooks before opening a pull requests.
