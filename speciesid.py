@@ -1,4 +1,3 @@
-import hashlib
 import json
 import multiprocessing
 import sqlite3
@@ -7,7 +6,6 @@ import time
 from datetime import datetime
 from io import BytesIO
 
-import cv2
 import numpy as np
 import paho.mqtt.client as mqtt
 import requests

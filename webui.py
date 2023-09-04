@@ -1,20 +1,8 @@
-import base64
-import sqlite3
-from datetime import date, datetime
-from io import BytesIO
+from datetime import datetime
 
 import requests
 import yaml
-from flask import (
-    Flask,
-    abort,
-    redirect,
-    render_template,
-    request,
-    send_file,
-    send_from_directory,
-    url_for,
-)
+from flask import Flask, abort, render_template, send_file, send_from_directory
 
 from queries import (
     get_common_name,
