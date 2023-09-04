@@ -1,0 +1,59 @@
+name: CI
+
+
+on:
+  push:
+  pull_request: ~
+  release:
+    types:
+      - published
+
+
+jobs:
+  lint:
+    name: Run pre-commit checks
+    uses: ./.github/workflows/pre-commit.yaml
+    with:
+      PYTHON_VERSION_DEFAULT: "3.11"
+  
+  docker_build:
+    name: Build docker image
+    if: ${{ github.event_name == 'release' || (github.event_name == 'push' && github.ref_name == 'dev') }}
+    needs:
+      - lint
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+
+    steps:
+      - name: Check out code from GitHub
+        uses: actions/checkout@v3
+
+      - name: Repository owner lowercase
+        id: lower
+        run: |
+          echo "repository_owner=$(echo $GITHUB_REPOSITORY_OWNER | tr [:upper:] [:lower:])" >> $GITHUB_OUTPUT
+
+      - name: Log in to the GitHub container registry
+        uses: docker/login-action@v2.1.0
+        with:
+            registry: ghcr.io
+            username: ${{ github.repository_owner }}
+            password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2.2.1
+
+      - name: Build and Push
+        uses: docker/build-push-action@v3.3.0
+        with:
+          context: .
+          file: Dockerfile
+          tags: >-
+            ${{ github.event_name == 'release'
+                && format('ghcr.io/{0}/whosatmyfeeder:{1},ghcr.io/{0}/whosatmyfeeder:latest',
+                           steps.lower.outputs.repository_owner,
+                           github.ref_name)
+                || format('ghcr.io/{0}/whosatmyfeeder:dev', steps.lower.outputs.repository_owner)
+            }}
+          push: true

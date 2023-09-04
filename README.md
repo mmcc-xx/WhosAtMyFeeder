@@ -20,7 +20,7 @@ field is currently limited to 20 characters
 This app acts as sidecar to [Frigate](https://frigate.video/) to identify the species of
 the birds that Frigate detects. It is using the bird species classifier model found here: https://tfhub.dev/google/lite-model/aiy/vision/classifier/birds_V1/3
 
-**Prequisites**
+**Prerequisites**
 
 1. A working & Accessible Frigate Installation with at least 1 Camera configured
 2. A MQTT Broker that Frigate successfully connects to
@@ -115,4 +115,8 @@ If you used the default config file and default docker-compose file you should b
 http://127.0.0.1:7766 or on http://yourserveraddress:7766
 
 **Docker Image**
-The image is on Docker Hub at https://hub.docker.com/r/mmcc73/whosatmyfeeder
+The image is on GitHub Container Registry `docker pull ghcr.io/mmcc-xx/whosatmyfeeder:latest`
+
+## Contibuiting
+Use [pre-commit](https://pre-commit.com/) hooks before opening a pull requests.
+Install pre-commit with `pip install pre-commit` and activate with `pre-commit install`.
