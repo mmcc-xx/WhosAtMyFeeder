@@ -18,7 +18,9 @@ jobs:
   
   docker_build:
     name: Build docker image
-    if: ${{ github.event_name == 'release' || (github.event_name == 'push' && github.reg_name == 'dev') }}
+    if: ${{ github.event_name == 'release' || (github.event_name == 'push' && github.ref_name == 'dev') }}
+    needs:
+      - lint
     runs-on: ubuntu-latest
     permissions:
       packages: write
