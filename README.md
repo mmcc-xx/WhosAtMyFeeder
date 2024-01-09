@@ -1,4 +1,7 @@
 # Who's At My Feeder?
+
+This app acts as sidecar to [Frigate](https://frigate.video/) to identify the species of the birds that Frigate detects. It is using the bird species classifier model found here: https://tfhub.dev/google/lite-model/aiy/vision/classifier/birds_V1/3
+
 ## What's New?
 I'm just about to push a significant update. This will require you to...
 * Delete you current speciesid.db database. If you are attached to that data, just move it somewhere else
@@ -16,9 +19,6 @@ field is currently limited to 20 characters
 * I also changed (improved, I hope) the UI significantly. I don't think there's any lost functionality.
 
 ![screenshot](screenshot2.jpg)
-
-This app acts as sidecar to [Frigate](https://frigate.video/) to identify the species of
-the birds that Frigate detects. It is using the bird species classifier model found here: https://tfhub.dev/google/lite-model/aiy/vision/classifier/birds_V1/3
 
 **Prequisites**
 
